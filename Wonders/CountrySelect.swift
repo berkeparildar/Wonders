@@ -21,6 +21,7 @@ struct CountrySelect: View {
                     .clipShape(.rect(cornerRadius: 10))
             }
         }
+        .preferredColorScheme(.dark)
     }
 }
 

@@ -22,44 +22,43 @@ struct CountrySite: Decodable, Identifiable {
         let start: String
         let end: String
     }
+}
+
+enum SiteType: String, Decodable {
+    case historicSite
+    case religiousSite
+    case castle
+    case walkingArea
+    case museum
     
-    enum SiteType: String, Decodable {
-        case historicSite
-        case religiousSite
-        case castle
-        case walkingArea
-        case museum
-        
-        var name: String {
-            switch self {
-            case .historicSite:
-                "Historic Site"
-            case .religiousSite:
-                "Religious Site"
-            case .castle:
-                "Castle"
-            case .walkingArea:
-                "Walking Area"
-            case .museum:
-                "Museum"
-            }
+    var name: String {
+        switch self {
+        case .historicSite:
+            "Historic Site"
+        case .religiousSite:
+            "Religious Site"
+        case .castle:
+            "Castle"
+        case .walkingArea:
+            "Walking Area"
+        case .museum:
+            "Museum"
         }
-        
-        var backgroundColor : Color {
-            switch self {
-                
-            case .historicSite:
-                    .blue
-            case .religiousSite:
-                    .red
-            case .castle:
-                    .brown
-            case .walkingArea:
-                    .green
-            case .museum:
-                    .white
-            }
+    }
+    
+    var backgroundColor : Color {
+        switch self {
+            
+        case .historicSite:
+                .blue
+        case .religiousSite:
+                .red
+        case .castle:
+                .brown
+        case .walkingArea:
+                .green
+        case .museum:
+                .white
         }
     }
 }
-

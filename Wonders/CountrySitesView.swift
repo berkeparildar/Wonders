@@ -8,6 +8,7 @@
 import SwiftUI
 struct CountrySitesView: View {
     @StateObject var countrySiteController: CountrySiteController
+    @State var searchText: String = ""
     var body: some View {
         NavigationStack {
             if countrySiteController.countrySites.isEmpty {
@@ -15,12 +16,14 @@ struct CountrySitesView: View {
             }
             else {
                 List(countrySiteController.countrySites) { countrySite in
-                    Text(countrySite.image)
-                    countrySiteController.siteImages[countrySite.id - 1]
-                        .resizable()
-                        .scaledToFit()
+                    CountrySiteTile(siteName: countrySite.name, siteImage: countrySiteController.siteImages[countrySite.id - 1], siteType: countrySite.type)
                         .frame(height: 100)
                 }
+                .navigationTitle("Japan Sites")
+                .searchable(text: $searchText)
+                .autocorrectionDisabled()
+                .animation(.default, value: searchText)
+                
             }
         }
         .onAppear(perform: {
@@ -33,4 +36,5 @@ struct CountrySitesView: View {
     NavigationStack {
         CountrySitesView(countrySiteController: CountrySiteController())
     }
+    .preferredColorScheme(.dark)
 }
