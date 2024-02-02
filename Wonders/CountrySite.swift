@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftUI
+import MapKit
 
 struct CountrySite: Decodable, Identifiable {
     let id: Int
@@ -17,6 +18,10 @@ struct CountrySite: Decodable, Identifiable {
     let longitude: Double
     let openHours: OpenHours
     let description: String
+    
+    var location: CLLocationCoordinate2D {
+            CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+        }
     
     struct OpenHours: Decodable {
         let start: String
