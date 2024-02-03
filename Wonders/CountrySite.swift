@@ -69,7 +69,7 @@ enum SiteType: String, Decodable, CaseIterable, Identifiable {
         case .walkingArea:
                 .green
         case .museum:
-                .white
+                .cyan
         case .all:
                 .black
         }

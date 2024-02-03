@@ -108,6 +108,28 @@ class CountrySiteController: ObservableObject {
         }
     }
     
+    func isOpenNow(site: CountrySite) -> Bool {
+        
+        if site.openHours.start.lowercased() == "open" && site.openHours.end.lowercased() == "open" {
+            return true
+        }
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "hh:mm a"
+        
+        let currentTimeString = dateFormatter.string(from: Date())
+        let startTimeString = site.openHours.start
+        let endTimeString = site.openHours.end
+        
+        if let currentTime = dateFormatter.date(from: currentTimeString),
+           let startTime = dateFormatter.date(from: startTimeString),
+           let endTime = dateFormatter.date(from: endTimeString) {
+            return currentTime >= startTime && currentTime <= endTime
+        }
+        
+        return false
+    }
+    
     func getCountryFlag(country: String) -> String {
         var returnString = ""
         switch country {
@@ -115,8 +137,8 @@ class CountrySiteController: ObservableObject {
             returnString = "🇯🇵"
         case "turkey":
             returnString = "🇹🇷"
-        case "us":
-            returnString = "🇺🇸"
+        case "england":
+            returnString = "🏴󠁧󠁢󠁥󠁮󠁧󠁿"
         case "france":
             returnString = "🇫🇷"
         case "italy":

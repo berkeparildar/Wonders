@@ -11,6 +11,8 @@ struct CountrySiteTile: View {
     var siteName: String
     var siteImage: Image
     var siteType: SiteType
+    var width: CGFloat
+    var height: CGFloat
     var body: some View {
         HStack {
             siteImage
@@ -25,17 +27,24 @@ struct CountrySiteTile: View {
                 Text(siteName)
                     .font(.title3)
                     .fontWeight(.bold)
+                    .multilineTextAlignment(.leading)
                 Text(siteType.name)
                     .font(.subheadline)
                     .padding(5)
                     .background(siteType.backgroundColor)
                     .clipShape(.capsule)
             })
+            Spacer()
+            Image(systemName: "arrow.right")
+                .foregroundStyle(.gray)
         }
-        .preferredColorScheme(/*@START_MENU_TOKEN@*/.dark/*@END_MENU_TOKEN@*/)
+        .frame(width: width, height: height, alignment: .leading)
+        //.background(.regularMaterial)
+        .clipShape(.rect(cornerRadius: 10))
     }
 }
 
 #Preview {
-    CountrySiteTile(siteName: "SiteName", siteImage: Image(systemName: "globe"), siteType: .castle)
+    CountrySiteTile(siteName: "SiteName", siteImage: Image(systemName: "globe"), siteType: .castle, width: 200, height: 100)
+        .preferredColorScheme(.dark)
 }

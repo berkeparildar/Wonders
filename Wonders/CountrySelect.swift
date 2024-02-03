@@ -18,8 +18,7 @@ struct CountrySelect: View {
                 CountryIcon(countryName: "italy", countrySiteController: countrySiteContoller)
                 CountryIcon(countryName: "korea", countrySiteController: countrySiteContoller)
                 CountryIcon(countryName: "france", countrySiteController: countrySiteContoller)
-                CountryIcon(countryName: "us", countrySiteController: countrySiteContoller)
-                
+                CountryIcon(countryName: "england", countrySiteController: countrySiteContoller)
             })
             .padding()
         }

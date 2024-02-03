@@ -68,14 +68,14 @@
 				627D37A42B6C32E00042F764 /* WondersApp.swift */,
 				627D37A62B6C32E00042F764 /* CountrySitesView.swift */,
 				62CAA2892B6D408500CCE621 /* SiteDetail.swift */,
+				62E437A82B6E8A3100232F98 /* CountryIcon.swift */,
+				62CAA2852B6D0B8100CCE621 /* CountrySelect.swift */,
+				62CAA2872B6D388300CCE621 /* CountrySiteTile.swift */,
 				62CAA28B2B6D59F100CCE621 /* SiteMap.swift */,
 				627D37B42B6C35C00042F764 /* CountrySite.swift */,
 				627D37B62B6C35EA0042F764 /* CountrySiteController.swift */,
 				627D37A82B6C32E10042F764 /* Assets.xcassets */,
 				627D37AA2B6C32E10042F764 /* Preview Content */,
-				62CAA2852B6D0B8100CCE621 /* CountrySelect.swift */,
-				62CAA2872B6D388300CCE621 /* CountrySiteTile.swift */,
-				62E437A82B6E8A3100232F98 /* CountryIcon.swift */,
 			);
 			path = Wonders;
 			sourceTree = "<group>";

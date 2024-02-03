@@ -10,6 +10,7 @@ import MapKit
 
 struct SiteDetail: View {
     let site: CountrySite
+    var isOpen: Bool
     @State var position: MapCameraPosition
     let siteImage: Image
     
@@ -28,8 +29,25 @@ struct SiteDetail: View {
                         )
                     }
                 VStack (alignment: .leading) {
-                    Text(site.name)
-                        .font(.largeTitle)
+                    HStack {
+                        Text(site.name)
+                            .font(.largeTitle)
+                        Spacer()
+                        if isOpen {
+                            Text("Open")
+                                .font(.subheadline)
+                                .padding(5)
+                                .background(.green)
+                                .clipShape(.capsule)
+                        }
+                        else {
+                            Text("Closed")
+                                .padding(5)
+                                .font(.subheadline)
+                                .background(.red)
+                                .clipShape(.capsule)
+                        }
+                    }
                     NavigationLink{
                         SiteMap(site: site, position: .camera(MapCamera(centerCoordinate: site.location, distance: 1000, heading: 250, pitch: 80)))
                     } label: {
@@ -55,8 +73,8 @@ struct SiteDetail: View {
                             Text("\(site.name) Location")
                                 .padding([.leading, .bottom], 5)
                                 .padding(.trailing, 8)
-                                .background(.black.opacity(0.7))
-                                .clipShape(.rect(bottomTrailingRadius: 15))
+                                .background(.regularMaterial)
+                                
                         })
                         .clipShape(.rect(cornerRadius: 15))
                         .padding(.bottom, 10)
@@ -67,13 +85,15 @@ struct SiteDetail: View {
                 .padding()
                 .frame(width: geo.size.width, alignment: .leading)
             }
-            .ignoresSafeArea()
-            .toolbarBackground(.automatic)
         }
+        .navigationTitle("")
+        .navigationBarTitleDisplayMode(.large)
+        .ignoresSafeArea()
+        .toolbarBackground(.hidden)
     }
 }
 
 #Preview {
-    SiteDetail(site: CountrySite(id: 1, name: "Country Site", image: "asd", type: .castle, latitude: 35.0394, longitude: 135.7292, openHours: CountrySite.OpenHours(start: "a", end: "b"), description: "Description"), position: .camera(MapCamera(centerCoordinate: CLLocationCoordinate2D(latitude: 35.0394, longitude: 135.7292), distance: 30000)), siteImage: Image(systemName: "globe"))
+    SiteDetail(site: CountrySite(id: 1, name: "Country Site", image: "asd", type: .castle, latitude: 35.0394, longitude: 135.7292, openHours: CountrySite.OpenHours(start: "a", end: "b"), description: "Description"), isOpen: true, position: .camera(MapCamera(centerCoordinate: CLLocationCoordinate2D(latitude: 35.0394, longitude: 135.7292), distance: 30000)), siteImage: Image(systemName: "globe"))
         .preferredColorScheme(.dark)
 }
