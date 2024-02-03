@@ -7,8 +7,10 @@
 
 import Foundation
 import SwiftUI
+import Combine
 
 class CountrySiteController: ObservableObject {
+    var hasFetchedData: Bool = false
     @Published var countrySites: [CountrySite] = []
     @Published var siteImages: [Image] = [
         Image(systemName: "globe"),
@@ -22,6 +24,8 @@ class CountrySiteController: ObservableObject {
         Image(systemName: "globe"),
         Image(systemName: "globe")
     ]
+    var countrySitesMain: [CountrySite] = []
+    var countrySitesMainTwo: [CountrySite] = []
     
     func fetchCountryData (country countryName: String) {
         guard let url = URL(string: "http://localhost:5274/api/countries/\(countryName.lowercased())")
@@ -35,6 +39,9 @@ class CountrySiteController: ObservableObject {
                 do {
                     self.countrySites = try decoder.decode([CountrySite].self, from: data)
                     fetchImageData()
+                    hasFetchedData = true
+                    countrySitesMain = countrySites
+                    countrySitesMainTwo = countrySites
                 } catch {
                     print("Error decoding JSON: \(error)")
                 }
@@ -42,6 +49,22 @@ class CountrySiteController: ObservableObject {
                 print("Network request error: \(error.localizedDescription)")
             }
         }.resume()
+    }
+    
+    func search(for searchTerm: String) -> [CountrySite] {
+        if searchTerm.isEmpty {
+            return countrySitesMainTwo
+        }
+        else {
+            return countrySitesMainTwo.filter { site in
+                site.name.localizedCaseInsensitiveContains(searchTerm)
+            }
+        }
+    }
+    
+    func resetData() {
+        countrySites.removeAll()
+        hasFetchedData = false
     }
     
     func fetchImageData () {
@@ -60,6 +83,28 @@ class CountrySiteController: ObservableObject {
                     print("Network request error: \(error.localizedDescription)")
                 }
             }.resume()
+        }
+    }
+    
+    func sort(by alphabetical: Bool) {
+        countrySitesMainTwo.sort { site1, site2 in
+            if alphabetical {
+                site1.name < site2.name
+            }
+            else {
+                site1.id < site2.id
+            }
+        }
+    }
+    
+    func filter(by type: SiteType) {
+        if type == .all {
+            countrySitesMainTwo = countrySites
+        }
+        else {
+            countrySitesMainTwo = countrySitesMain.filter { site in
+                site.type == type
+            }
         }
     }
 }

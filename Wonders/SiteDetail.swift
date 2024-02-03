@@ -30,9 +30,45 @@ struct SiteDetail: View {
                 VStack (alignment: .leading) {
                     Text(site.name)
                         .font(.largeTitle)
+                    NavigationLink{
+                        SiteMap(site: site, position: .camera(MapCamera(centerCoordinate: site.location, distance: 1000, heading: 250, pitch: 80)))
+                    } label: {
+                        Map(position: $position) {
+                            Annotation(site.name, coordinate: site.location)
+                            {
+                                Image(systemName: "mappin")
+                                    .font(.largeTitle)
+                                    .imageScale(.large)
+                                    .symbolEffect(.pulse)
+                                    .foregroundStyle(.red)
+                            }
+                            .annotationTitles(.hidden)
+                        }
+                        .frame(height: 125)
+                        .overlay(alignment: .trailing, content: {
+                            Image(systemName: "greaterthan")
+                                .imageScale(.large)
+                                .font(.title3)
+                                .padding(.trailing, 5)
+                        })
+                        .overlay(alignment: .topLeading, content: {
+                            Text("\(site.name) Location")
+                                .padding([.leading, .bottom], 5)
+                                .padding(.trailing, 8)
+                                .background(.black.opacity(0.7))
+                                .clipShape(.rect(bottomTrailingRadius: 15))
+                        })
+                        .clipShape(.rect(cornerRadius: 15))
+                        .padding(.bottom, 10)
+                    }
                     Text(site.description)
+                        .padding(5)
                 }
+                .padding()
+                .frame(width: geo.size.width, alignment: .leading)
             }
+            .ignoresSafeArea()
+            .toolbarBackground(.automatic)
         }
     }
 }

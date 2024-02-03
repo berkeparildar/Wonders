@@ -29,12 +29,17 @@ struct CountrySite: Decodable, Identifiable {
     }
 }
 
-enum SiteType: String, Decodable {
+enum SiteType: String, Decodable, CaseIterable, Identifiable {
     case historicSite
     case religiousSite
     case castle
     case walkingArea
     case museum
+    case all
+    
+    var id: SiteType {
+        self
+    }
     
     var name: String {
         switch self {
@@ -48,6 +53,8 @@ enum SiteType: String, Decodable {
             "Walking Area"
         case .museum:
             "Museum"
+        case .all:
+            "All"
         }
     }
     
@@ -64,6 +71,8 @@ enum SiteType: String, Decodable {
                 .green
         case .museum:
                 .white
+        case .all:
+                .black
         }
     }
 }

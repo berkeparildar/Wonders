@@ -9,10 +9,11 @@ import SwiftUI
 
 struct CountrySelect: View {
     let countrySiteContoller = CountrySiteController()
+    
     var body: some View {
         NavigationStack {
             NavigationLink {
-                CountrySitesView(countrySiteController: countrySiteContoller)
+                CountrySitesView(countrySiteController: countrySiteContoller, countryName: "japan")
             } label: {
                Text("Show Japan")
                     .foregroundStyle(.white)
@@ -21,6 +22,9 @@ struct CountrySelect: View {
                     .clipShape(.rect(cornerRadius: 10))
             }
         }
+        .onAppear(perform: {
+            countrySiteContoller.resetData()
+        })
         .preferredColorScheme(.dark)
     }
 }
