@@ -39,21 +39,29 @@ struct CountrySitesView: View {
                 .autocorrectionDisabled()
                 .animation(.default, value: searchText)
                 .toolbar {
-                    ToolbarItem(placement: .topBarLeading, content: {
+                    ToolbarItem(placement: .topBarTrailing, content: {
                         Button {
                             withAnimation {
                                 alphabetical.toggle()
                             }
                         } label: {
-                            Image(systemName: alphabetical ? "textformat" : "film")
-                                .symbolEffect(.bounce, value: alphabetical)
+                            if alphabetical {
+                                Image(systemName: "textformat")
+                                    .symbolEffect(.bounce, value: alphabetical)
+                                    .foregroundStyle(.blue)
+                            }
+                            else {
+                                Image(systemName: "textformat")
+                                    .symbolEffect(.bounce, value: alphabetical)
+                            }
                         }
+                        
                     })
                     ToolbarItem(placement: .topBarTrailing) {
                         Menu {
                             Picker("Filter", selection: $currentSelection.animation()) {
                                 ForEach(SiteType.allCases) { type in
-                                    Label(type.name.capitalized, systemImage: "globe")
+                                    Label(type.name.capitalized, systemImage: "\(type.icon)")
                                 }
                             }
                         } label: {

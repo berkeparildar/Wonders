@@ -20,8 +20,8 @@ struct CountrySite: Decodable, Identifiable {
     let description: String
     
     var location: CLLocationCoordinate2D {
-            CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
-        }
+        CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+    }
     
     struct OpenHours: Decodable {
         let start: String
@@ -60,7 +60,6 @@ enum SiteType: String, Decodable, CaseIterable, Identifiable {
     
     var backgroundColor : Color {
         switch self {
-            
         case .historicSite:
                 .blue
         case .religiousSite:
@@ -73,6 +72,23 @@ enum SiteType: String, Decodable, CaseIterable, Identifiable {
                 .white
         case .all:
                 .black
+        }
+    }
+    
+    var icon: String {
+        switch self {
+        case .historicSite:
+            "fossil.shell.fill"
+        case .religiousSite:
+            "swirl.circle.righthalf.filled"
+        case .castle:
+            "house.lodge.fill"
+        case .walkingArea:
+            "figure.walk"
+        case .museum:
+            "photo.artframe"
+        case .all:
+            "square.stack.3d.up.fill"
         }
     }
 }

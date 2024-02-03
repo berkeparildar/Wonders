@@ -107,4 +107,25 @@ class CountrySiteController: ObservableObject {
             }
         }
     }
+    
+    func getCountryFlag(country: String) -> String {
+        var returnString = ""
+        switch country {
+        case "japan":
+            returnString = "🇯🇵"
+        case "turkey":
+            returnString = "🇹🇷"
+        case "us":
+            returnString = "🇺🇸"
+        case "france":
+            returnString = "🇫🇷"
+        case "italy":
+            returnString = "🇮🇹"
+        case "korea":
+            returnString = "🇰🇷"
+        default:
+            returnString = ""
+        }
+        return returnString
+    }
 }

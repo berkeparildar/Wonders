@@ -12,15 +12,16 @@ struct CountrySelect: View {
     
     var body: some View {
         NavigationStack {
-            NavigationLink {
-                CountrySitesView(countrySiteController: countrySiteContoller, countryName: "japan")
-            } label: {
-               Text("Show Japan")
-                    .foregroundStyle(.white)
-                    .padding()
-                    .background(.blue)
-                    .clipShape(.rect(cornerRadius: 10))
-            }
+            LazyVGrid(columns: [GridItem(), GridItem(), GridItem()], alignment: .center, spacing: 20, content: {
+                CountryIcon(countryName: "japan", countrySiteController: countrySiteContoller)
+                CountryIcon(countryName: "turkey", countrySiteController: countrySiteContoller)
+                CountryIcon(countryName: "italy", countrySiteController: countrySiteContoller)
+                CountryIcon(countryName: "korea", countrySiteController: countrySiteContoller)
+                CountryIcon(countryName: "france", countrySiteController: countrySiteContoller)
+                CountryIcon(countryName: "us", countrySiteController: countrySiteContoller)
+                
+            })
+            .padding()
         }
         .onAppear(perform: {
             countrySiteContoller.resetData()
