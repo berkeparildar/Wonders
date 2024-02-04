@@ -9,27 +9,34 @@ import SwiftUI
 
 struct CountryIcon: View {
     let countryName: String
+    let countryImage: Image
     let countrySiteController: CountrySiteController
     var body: some View {
         NavigationLink {
             CountrySitesView(countrySiteController: countrySiteController, countryName: countryName)
         } label: {
-                VStack {
-                    Text(countrySiteController.getCountryFlag(country: countryName))
-                        .font(.system(size: 50))
+            ZStack(alignment: .bottomTrailing) {
+                countryImage
+                    .resizable()
+                    .scaledToFit()
+                VStack (alignment: .trailing) {
+                    Spacer()
                     Text(countryName.capitalized)
                         .lineLimit(1)
                         .minimumScaleFactor(0.5)
+                        .padding(4)
+                        .background(.regularMaterial)
+                        .clipShape(.capsule)
                 }
                 .foregroundStyle(.white)
                 .padding(5)
-            .frame(width: 100, height: 100)
-            .background(.regularMaterial)
+            }
             .clipShape(.rect(cornerRadius: 10))
         }
     }
 }
 
 #Preview {
-    CountryIcon(countryName: "japan", countrySiteController: CountrySiteController())
+    CountryIcon(countryName: "japan", countryImage: Image(systemName: "globe"), countrySiteController: CountrySiteController())
+        .preferredColorScheme(.dark)
 }

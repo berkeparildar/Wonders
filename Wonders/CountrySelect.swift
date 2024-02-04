@@ -8,21 +8,39 @@
 import SwiftUI
 
 struct CountrySelect: View {
-    let countrySiteContoller = CountrySiteController()
-    
+    @StateObject var countrySiteContoller = CountrySiteController()
+    @State var searchText: String = ""
+    @State var alphabetical: Bool = false
+    var filteredCountries: [String] {
+        countrySiteContoller.sortCountry(by: alphabetical)
+        return countrySiteContoller.searchCountry(for: searchText)
+    }
     var body: some View {
         NavigationStack {
-            LazyVGrid(columns: [GridItem(), GridItem(), GridItem()], alignment: .center, spacing: 20, content: {
-                CountryIcon(countryName: "japan", countrySiteController: countrySiteContoller)
-                CountryIcon(countryName: "turkey", countrySiteController: countrySiteContoller)
-                CountryIcon(countryName: "italy", countrySiteController: countrySiteContoller)
-                CountryIcon(countryName: "korea", countrySiteController: countrySiteContoller)
-                CountryIcon(countryName: "france", countrySiteController: countrySiteContoller)
-                CountryIcon(countryName: "england", countrySiteController: countrySiteContoller)
-            })
-            .padding()
+            ScrollView {
+                VStack (alignment: .leading) {
+                    Text("Countries")
+                        .font(.largeTitle)
+                        .fontWeight(.bold)
+                        .padding(20)
+                    LazyVGrid(columns: [GridItem(), GridItem()], alignment: .center, spacing: 20, content: {
+                        ForEach(filteredCountries, id: \.self) {country in
+                            CountryIcon(countryName: country,
+                                        countryImage: countrySiteContoller.countryImages[
+                                            countrySiteContoller.countries.firstIndex(of: country)!
+                                        ],
+                                        countrySiteController: countrySiteContoller)
+                        }
+                    })
+                    .padding()
+                }
+                .navigationTitle("Wonders")
+                .navigationBarTitleDisplayMode(.inline)
+                .searchable(text: $searchText)
+            }
         }
         .onAppear(perform: {
+            countrySiteContoller.fetchCountryImages()
             countrySiteContoller.resetData()
         })
         .preferredColorScheme(.dark)

@@ -11,6 +11,7 @@ import Combine
 
 class CountrySiteController: ObservableObject {
     var hasFetchedData: Bool = false
+    var hasFetchedImages: Bool = false
     @Published var countrySites: [CountrySite] = []
     @Published var siteImages: [Image] = [
         Image(systemName: "globe"),
@@ -24,8 +25,34 @@ class CountrySiteController: ObservableObject {
         Image(systemName: "globe"),
         Image(systemName: "globe")
     ]
+    @Published var countryImages: [Image] = [
+        Image(systemName: "globe"),
+        Image(systemName: "globe"),
+        Image(systemName: "globe"),
+        Image(systemName: "globe"),
+        Image(systemName: "globe"),
+        Image(systemName: "globe"),
+    ]
+    
+    let countries: [String] = [
+        "japan",
+        "turkey",
+        "italy",
+        "france",
+        "korea",
+        "england"
+    ]
+    
     var countrySitesMain: [CountrySite] = []
     var countrySitesMainTwo: [CountrySite] = []
+    var modifiedCountries: [String] = [
+        "japan",
+        "turkey",
+        "italy",
+        "france",
+        "korea",
+        "england"
+    ]
     
     func fetchCountryData (country countryName: String) {
         guard let url = URL(string: "http://localhost:5274/api/countries/\(countryName.lowercased())")
@@ -38,7 +65,7 @@ class CountrySiteController: ObservableObject {
                 decoder.keyDecodingStrategy = .convertFromSnakeCase
                 do {
                     self.countrySites = try decoder.decode([CountrySite].self, from: data)
-                    fetchImageData()
+                    fetchImageData(countryName: countryName)
                     hasFetchedData = true
                     countrySitesMain = countrySites
                     countrySitesMainTwo = countrySites
@@ -62,14 +89,26 @@ class CountrySiteController: ObservableObject {
         }
     }
     
+    func searchCountry(for searchTerm: String) -> [String] {
+        if searchTerm.isEmpty {
+            return modifiedCountries
+        }
+        else {
+            return modifiedCountries.filter { country in
+                country.localizedCaseInsensitiveContains(searchTerm)
+            }
+        }
+    }
+    
     func resetData() {
         countrySites.removeAll()
         hasFetchedData = false
     }
     
-    func fetchImageData () {
+    func fetchImageData (countryName: String) {
+        modifiedCountries = countries
         for index in countrySites.indices {
-            guard let url = URL(string: "http://localhost:5274/api/image/\(countrySites[index].image)")
+            guard let url = URL(string: "http://localhost:5274/api/image/\(countryName)-\(countrySites[index].image)")
             else {
                 return
             }
@@ -77,6 +116,26 @@ class CountrySiteController: ObservableObject {
                 if let data = data {
                     if let uiImage = UIImage(data: data) {
                         self.siteImages[index] = Image(uiImage: uiImage)
+                        hasFetchedImages = true
+                    }
+                }
+                else if let error = error {
+                    print("Network request error: \(error.localizedDescription)")
+                }
+            }.resume()
+        }
+    }
+    
+    func fetchCountryImages () {
+        for index in countries.indices {
+            guard let url = URL(string: "http://localhost:5274/api/image/countries-\(countries[index])")
+            else {
+                return
+            }
+            URLSession.shared.dataTask(with: url) { [self] data, response, error in
+                if let data = data {
+                    if let uiImage = UIImage(data: data) {
+                        self.countryImages[index] = Image(uiImage: uiImage)
                     }
                 }
                 else if let error = error {
@@ -94,6 +153,17 @@ class CountrySiteController: ObservableObject {
             else {
                 site1.id < site2.id
             }
+        }
+    }
+    
+    func sortCountry (by alphabetical: Bool) {
+        if alphabetical {
+            modifiedCountries.sort { country1, country2 in
+                country1 < country2
+            }
+        }
+        else {
+            modifiedCountries = countries
         }
     }
     
