@@ -22,7 +22,7 @@ struct CountrySitesView: View {
     var countryName: String
     var body: some View {
         VStack {
-            if !countrySiteController.hasFetchedData {
+            if !countrySiteController.hasFetchedData && !countrySiteController.hasFetchedImages {
                 VStack {
                     ProgressView("Loading...")
                 }

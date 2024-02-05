@@ -37,7 +37,6 @@ class CountrySiteController: ObservableObject {
         Image(systemName: "globe"),
         Image(systemName: "globe"),
     ]
-    
     let countries: [String] = [
         "japan",
         "turkey",
@@ -46,7 +45,6 @@ class CountrySiteController: ObservableObject {
         "korea",
         "england"
     ]
-    
     var modifiedCountries: [String] = [
         "japan",
         "turkey",
@@ -55,29 +53,31 @@ class CountrySiteController: ObservableObject {
         "korea",
         "england"
     ]
+    private var cancellables: Set<AnyCancellable> = []
+    
     
     func fetchCountrySites (country countryName: String) {
-        guard let url = URL(string: "http://localhost:5274/api/countries/\(countryName.lowercased())")
-        else {
-            return
-        }
-        URLSession.shared.dataTask(with: url) { [self] data, response, error in
-            if let data = data {
-                let decoder = JSONDecoder()
-                decoder.keyDecodingStrategy = .convertFromSnakeCase
-                do {
-                    self.countrySites = try decoder.decode([CountrySite].self, from: data)
-                    fetchCountrySiteImages(countryName: countryName)
-                    hasFetchedData = true
-                    countrySitesModifiable = countrySites
-                } catch {
-                    print("Error decoding JSON: \(error)")
-                }
-            } else if let error = error {
-                print("Network request error: \(error.localizedDescription)")
+            guard let url = URL(string: "http://localhost:5274/api/countries/\(countryName.lowercased())")
+            else {
+                return
             }
-        }.resume()
-    }
+            URLSession.shared.dataTask(with: url) { [self] data, response, error in
+                if let data = data {
+                    let decoder = JSONDecoder()
+                    decoder.keyDecodingStrategy = .convertFromSnakeCase
+                    do {
+                        self.countrySites = try decoder.decode([CountrySite].self, from: data)
+                        fetchCountrySiteImages(countryName: countryName)
+                        hasFetchedData = true
+                        countrySitesModifiable = countrySites
+                    } catch {
+                        print("Error decoding JSON: \(error)")
+                    }
+                } else if let error = error {
+                    print("Network request error: \(error.localizedDescription)")
+                }
+            }.resume()
+        }
     
     func searchCountrySites(for searchTerm: String) -> [CountrySite] {
         if searchTerm.isEmpty {
@@ -105,6 +105,7 @@ class CountrySiteController: ObservableObject {
         countrySites.removeAll()
         countrySitesModifiable.removeAll()
         hasFetchedData = false
+        hasFetchedImages = false
     }
     
     func fetchCountrySiteImages (countryName: String) {
@@ -114,17 +115,25 @@ class CountrySiteController: ObservableObject {
             else {
                 return
             }
-            URLSession.shared.dataTask(with: url) { [self] data, response, error in
-                if let data = data {
+            URLSession.shared.dataTaskPublisher(for: url)
+                .map(\.data)
+                .receive(on: DispatchQueue.main) // Switch to the main thread for UI updates
+                .sink { completion in
+                    switch completion {
+                    case .finished :
+                        if index == self.countrySites.count - 1 {
+                            self.hasFetchedImages = true
+                        }
+                    case .failure(_):
+                        print("error:")
+                    }
+                } receiveValue: { [weak self] data in
                     if let uiImage = UIImage(data: data) {
-                        self.siteImages[index] = Image(uiImage: uiImage)
-                        hasFetchedImages = true
+                        self?.siteImages[index] = Image(uiImage: uiImage)
+                        self?.hasFetchedImages = true
                     }
                 }
-                else if let error = error {
-                    print("Network request error: \(error.localizedDescription)")
-                }
-            }.resume()
+                .store(in: &cancellables)
         }
     }
     
@@ -134,19 +143,25 @@ class CountrySiteController: ObservableObject {
             else {
                 return
             }
-            URLSession.shared.dataTask(with: url) { [self] data, response, error in
-                if let data = data {
-                    if let uiImage = UIImage(data: data) {
-                        self.countryImages[index] = Image(uiImage: uiImage)
-                        if index == countries.count - 1 {
-                            hasFetchedCountryImages = true
+            URLSession.shared.dataTaskPublisher(for: url)
+                .map(\.data)
+                .receive(on: DispatchQueue.main)
+                .sink { completion in
+                    switch completion {
+                    case .finished:
+                        if index == self.countries.count - 1 {
+                            self.hasFetchedCountryImages = true
                         }
+                    case .failure(_):
+                        print("error")
+                    }
+                } receiveValue: { [weak self] data in
+                    if let uiImage = UIImage(data: data) {
+                        self?.countryImages[index] = Image(uiImage: uiImage)
                     }
                 }
-                else if let error = error {
-                    print("Network request error: \(error.localizedDescription)")
-                }
-            }.resume()
+                .store(in: &cancellables)
+            
         }
     }
     
