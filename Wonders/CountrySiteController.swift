@@ -12,7 +12,10 @@ import Combine
 class CountrySiteController: ObservableObject {
     var hasFetchedData: Bool = false
     var hasFetchedImages: Bool = false
-    @Published var countrySites: [CountrySite] = []
+    var hasFetchedCountryImages: Bool = false
+    var countrySites: [CountrySite] = []
+    var countrySitesModifiable: [CountrySite] = []
+    
     @Published var siteImages: [Image] = [
         Image(systemName: "globe"),
         Image(systemName: "globe"),
@@ -25,6 +28,7 @@ class CountrySiteController: ObservableObject {
         Image(systemName: "globe"),
         Image(systemName: "globe")
     ]
+    
     @Published var countryImages: [Image] = [
         Image(systemName: "globe"),
         Image(systemName: "globe"),
@@ -43,8 +47,6 @@ class CountrySiteController: ObservableObject {
         "england"
     ]
     
-    var countrySitesMain: [CountrySite] = []
-    var countrySitesMainTwo: [CountrySite] = []
     var modifiedCountries: [String] = [
         "japan",
         "turkey",
@@ -54,7 +56,7 @@ class CountrySiteController: ObservableObject {
         "england"
     ]
     
-    func fetchCountryData (country countryName: String) {
+    func fetchCountrySites (country countryName: String) {
         guard let url = URL(string: "http://localhost:5274/api/countries/\(countryName.lowercased())")
         else {
             return
@@ -65,10 +67,9 @@ class CountrySiteController: ObservableObject {
                 decoder.keyDecodingStrategy = .convertFromSnakeCase
                 do {
                     self.countrySites = try decoder.decode([CountrySite].self, from: data)
-                    fetchImageData(countryName: countryName)
+                    fetchCountrySiteImages(countryName: countryName)
                     hasFetchedData = true
-                    countrySitesMain = countrySites
-                    countrySitesMainTwo = countrySites
+                    countrySitesModifiable = countrySites
                 } catch {
                     print("Error decoding JSON: \(error)")
                 }
@@ -78,12 +79,12 @@ class CountrySiteController: ObservableObject {
         }.resume()
     }
     
-    func search(for searchTerm: String) -> [CountrySite] {
+    func searchCountrySites(for searchTerm: String) -> [CountrySite] {
         if searchTerm.isEmpty {
-            return countrySitesMainTwo
+            return countrySitesModifiable
         }
         else {
-            return countrySitesMainTwo.filter { site in
+            return countrySitesModifiable.filter { site in
                 site.name.localizedCaseInsensitiveContains(searchTerm)
             }
         }
@@ -102,10 +103,11 @@ class CountrySiteController: ObservableObject {
     
     func resetData() {
         countrySites.removeAll()
+        countrySitesModifiable.removeAll()
         hasFetchedData = false
     }
     
-    func fetchImageData (countryName: String) {
+    func fetchCountrySiteImages (countryName: String) {
         modifiedCountries = countries
         for index in countrySites.indices {
             guard let url = URL(string: "http://localhost:5274/api/image/\(countryName)-\(countrySites[index].image)")
@@ -136,6 +138,9 @@ class CountrySiteController: ObservableObject {
                 if let data = data {
                     if let uiImage = UIImage(data: data) {
                         self.countryImages[index] = Image(uiImage: uiImage)
+                        if index == countries.count - 1 {
+                            hasFetchedCountryImages = true
+                        }
                     }
                 }
                 else if let error = error {
@@ -145,8 +150,8 @@ class CountrySiteController: ObservableObject {
         }
     }
     
-    func sort(by alphabetical: Bool) {
-        countrySitesMainTwo.sort { site1, site2 in
+    func sortCountrySites(by alphabetical: Bool) {
+        countrySitesModifiable.sort { site1, site2 in
             if alphabetical {
                 site1.name < site2.name
             }
@@ -167,57 +172,31 @@ class CountrySiteController: ObservableObject {
         }
     }
     
-    func filter(by type: SiteType) {
+    func filterCountrySites(by type: SiteType) {
         if type == .all {
-            countrySitesMainTwo = countrySites
+            countrySitesModifiable = countrySites
         }
         else {
-            countrySitesMainTwo = countrySitesMain.filter { site in
+            countrySitesModifiable = countrySites.filter { site in
                 site.type == type
             }
         }
     }
     
     func isOpenNow(site: CountrySite) -> Bool {
-        
         if site.openHours.start.lowercased() == "open" && site.openHours.end.lowercased() == "open" {
             return true
         }
-        
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "hh:mm a"
-        
         let currentTimeString = dateFormatter.string(from: Date())
         let startTimeString = site.openHours.start
         let endTimeString = site.openHours.end
-        
         if let currentTime = dateFormatter.date(from: currentTimeString),
            let startTime = dateFormatter.date(from: startTimeString),
            let endTime = dateFormatter.date(from: endTimeString) {
             return currentTime >= startTime && currentTime <= endTime
         }
-        
         return false
-    }
-    
-    func getCountryFlag(country: String) -> String {
-        var returnString = ""
-        switch country {
-        case "japan":
-            returnString = "🇯🇵"
-        case "turkey":
-            returnString = "🇹🇷"
-        case "england":
-            returnString = "🏴󠁧󠁢󠁥󠁮󠁧󠁿"
-        case "france":
-            returnString = "🇫🇷"
-        case "italy":
-            returnString = "🇮🇹"
-        case "korea":
-            returnString = "🇰🇷"
-        default:
-            returnString = ""
-        }
-        return returnString
     }
 }

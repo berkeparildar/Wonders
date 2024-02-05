@@ -14,29 +14,22 @@ struct CountrySitesView: View {
     @State var searchText: String = ""
     @State var currentSelection = SiteType.all
     var filteredSites: [CountrySite] {
-        countrySiteController.filter(by: currentSelection)
-        countrySiteController.sort(by: alphabetical)
-        return countrySiteController.search(for: searchText)
+        countrySiteController.filterCountrySites(by: currentSelection)
+        countrySiteController.sortCountrySites(by: alphabetical)
+        return countrySiteController.searchCountrySites(for: searchText)
     }
     
     var countryName: String
     var body: some View {
-        if !countrySiteController.hasFetchedData {
-            VStack {
-                ProgressView("Loading...")
-                
-            }
-            .onAppear(perform: {
-                if !countrySiteController.hasFetchedData {
-                    print("called")
-                    countrySiteController.fetchCountryData(country: countryName)
+        VStack {
+            if !countrySiteController.hasFetchedData {
+                VStack {
+                    ProgressView("Loading...")
                 }
-            })
-        }
-        else {
-            GeometryReader { geo in
-                ScrollView {
-                    VStack {
+            }
+            else {
+                GeometryReader { geo in
+                    ScrollView {
                         VStack {
                             ForEach(filteredSites) { countrySite in
                                 Divider()
@@ -50,51 +43,57 @@ struct CountrySitesView: View {
                                 .padding(5)
                             }
                         }
+                        .frame(width: geo.size.width * 0.95)
+                        .background(.regularMaterial)
+                        .clipShape(.rect(cornerRadius: 10))
+                        .animation(.default, value: searchText)
                     }
-                    .frame(width: geo.size.width * 0.95)
-                    .background(.regularMaterial)
-                    .clipShape(.rect(cornerRadius: 10))
-                    .animation(.default, value: searchText)
+                    .frame(width: geo.size.width)
                 }
-                .frame(width: geo.size.width)
-            }
-            .navigationTitle("Japan Sites")
-            .searchable(text: $searchText)
-            .textInputAutocapitalization(.never)
-            .autocorrectionDisabled()
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing, content: {
-                    Button {
-                        withAnimation {
-                            alphabetical.toggle()
-                        }
-                    } label: {
-                        if alphabetical {
-                            Image(systemName: "textformat")
-                                .symbolEffect(.bounce, value: alphabetical)
-                                .foregroundStyle(.blue)
-                        }
-                        else {
-                            Image(systemName: "textformat")
-                                .symbolEffect(.bounce, value: alphabetical)
-                        }
-                    }
-                    
-                })
-                ToolbarItem(placement: .topBarTrailing) {
-                    Menu {
-                        Picker("Filter", selection: $currentSelection.animation()) {
-                            ForEach(SiteType.allCases) { type in
-                                Label(type.name.capitalized, systemImage: "\(type.icon)")
+                .navigationTitle("\(countryName.capitalized) Sites")
+                .searchable(text: $searchText)
+                .textInputAutocapitalization(.never)
+                .autocorrectionDisabled()
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .topBarTrailing, content: {
+                        Button {
+                            withAnimation {
+                                alphabetical.toggle()
+                            }
+                        } label: {
+                            if alphabetical {
+                                Image(systemName: "textformat")
+                                    .symbolEffect(.bounce, value: alphabetical)
+                                    .foregroundStyle(.blue)
+                            }
+                            else {
+                                Image(systemName: "textformat")
+                                    .symbolEffect(.bounce, value: alphabetical)
                             }
                         }
-                    } label: {
-                        Image(systemName: "slider.horizontal.3")
+                        
+                    })
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Menu {
+                            Picker("Filter", selection: $currentSelection.animation()) {
+                                ForEach(SiteType.allCases) { type in
+                                    Label(type.name.capitalized, systemImage: "\(type.icon)")
+                                }
+                            }
+                        } label: {
+                            Image(systemName: "slider.horizontal.3")
+                        }
                     }
                 }
             }
         }
+        .onAppear(perform: {
+            if !countrySiteController.hasFetchedData {
+                print("called for \(countryName)")
+                countrySiteController.fetchCountrySites(country: countryName)
+            }
+        })
     }
 }
 

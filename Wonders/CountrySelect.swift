@@ -8,41 +8,53 @@
 import SwiftUI
 
 struct CountrySelect: View {
-    @StateObject var countrySiteContoller = CountrySiteController()
+    @StateObject var countrySiteController = CountrySiteController()
     @State var searchText: String = ""
     @State var alphabetical: Bool = false
     var filteredCountries: [String] {
-        countrySiteContoller.sortCountry(by: alphabetical)
-        return countrySiteContoller.searchCountry(for: searchText)
+        countrySiteController.sortCountry(by: alphabetical)
+        return countrySiteController.searchCountry(for: searchText)
     }
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack (alignment: .leading) {
-                    Text("Countries")
-                        .font(.largeTitle)
-                        .fontWeight(.bold)
-                        .padding(20)
-                    LazyVGrid(columns: [GridItem(), GridItem()], alignment: .center, spacing: 20, content: {
-                        ForEach(filteredCountries, id: \.self) {country in
-                            CountryIcon(countryName: country,
-                                        countryImage: countrySiteContoller.countryImages[
-                                            countrySiteContoller.countries.firstIndex(of: country)!
-                                        ],
-                                        countrySiteController: countrySiteContoller)
-                        }
-                    })
-                    .padding()
+            if !countrySiteController.hasFetchedCountryImages {
+                VStack {
+                    ProgressView("Loading...")
                 }
-                .navigationTitle("Wonders")
-                .navigationBarTitleDisplayMode(.inline)
-                .searchable(text: $searchText)
+                .onAppear(perform: {
+                    if !countrySiteController.hasFetchedCountryImages {
+                        countrySiteController.fetchCountryImages()
+                    }
+                })
+            }
+            else {
+                ScrollView {
+                    VStack (alignment: .leading) {
+                        Text("Countries")
+                            .font(.largeTitle)
+                            .fontWeight(.bold)
+                            .padding(20)
+                        LazyVGrid(columns: [GridItem(), GridItem()], alignment: .center, spacing: 10, content: {
+                            ForEach(filteredCountries, id: \.self) {country in
+                                CountryIcon(countryName: country,
+                                            countryImage: countrySiteController.countryImages[
+                                                countrySiteController.countries.firstIndex(of: country)!
+                                            ],
+                                            countrySiteController: countrySiteController)
+                            }
+                        })
+                        .padding()
+                    }
+                    .onAppear(perform: {
+                        countrySiteController.resetData()
+                    })
+                    .navigationTitle("Wonders")
+                    .navigationBarTitleDisplayMode(.inline)
+                    .searchable(text: $searchText)
+                    .animation(.default, value: searchText)
+                }
             }
         }
-        .onAppear(perform: {
-            countrySiteContoller.fetchCountryImages()
-            countrySiteContoller.resetData()
-        })
         .preferredColorScheme(.dark)
     }
 }
