@@ -48,10 +48,20 @@ struct CountrySelect: View {
                     .onAppear(perform: {
                         countrySiteController.resetData()
                     })
-                    .navigationTitle("Wonders")
+                    
                     .navigationBarTitleDisplayMode(.inline)
+                    .navigationTitle("Wonders")
                     .searchable(text: $searchText)
                     .animation(.default, value: searchText)
+                    .toolbar {
+                        ToolbarItem(placement: .principal) {
+                            HStack {
+                                Text("Wonders")
+                                Image(systemName: "building.columns")
+                            }
+                        }
+                    }
+                    
                 }
             }
         }
