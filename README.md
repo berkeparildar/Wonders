@@ -5,6 +5,8 @@
 
 Wonders is an iOS app developed using SwiftUI, accompanied by a robust backend server developed with ASP.NET Core. The app serves as a comprehensive guide for users to explore tourist attractions and must-visit places in various countries.
 
+**ASP.NET Core Server Repository:** [https://github.com/berkeparildar/WondersServer]
+
 <img src="media/1.png" alt="Gameplay Screenshot" width="30%">
 
 ## Features
