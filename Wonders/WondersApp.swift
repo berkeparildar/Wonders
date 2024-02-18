@@ -11,7 +11,7 @@ import SwiftUI
 struct WondersApp: App {
     var body: some Scene {
         WindowGroup {
-            CountrySelect()
+            CountryListView()
         }
     }
 }

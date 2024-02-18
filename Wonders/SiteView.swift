@@ -8,26 +8,32 @@
 import SwiftUI
 import MapKit
 
-struct SiteDetail: View {
-    let site: CountrySite
-    var isOpen: Bool
+struct SiteView: View {
+    let site: SiteModel
+    let isOpen: Bool
     @State var position: MapCameraPosition
-    let siteImage: Image
-    
     var body: some View {
         GeometryReader { geo in
             ScrollView {
-                siteImage
-                    .resizable()
-                    .scaledToFit()
-                    .overlay {
-                        LinearGradient(
-                            stops: [
-                                Gradient.Stop(color: .clear, location: 0.8),
-                                Gradient.Stop(color: .black, location: 1)
-                            ], startPoint: .top, endPoint: .bottom
-                        )
+                AsyncImage(
+                    url: site.image,
+                    content: { image in
+                        image
+                            .resizable()
+                            .scaledToFit()
+                            .overlay {
+                                LinearGradient(
+                                    stops: [
+                                        Gradient.Stop(color: .clear, location: 0.8),
+                                        Gradient.Stop(color: .black, location: 1)
+                                    ], startPoint: .top, endPoint: .bottom
+                                )
+                            }
+                    },
+                    placeholder: {
+                        ProgressView()
                     }
+                )                    
                 VStack (alignment: .leading) {
                     HStack {
                         Text(site.name)
@@ -49,7 +55,7 @@ struct SiteDetail: View {
                         }
                     }
                     NavigationLink{
-                        SiteMap(site: site, position: .camera(MapCamera(centerCoordinate: site.location, distance: 1000, heading: 250, pitch: 80)))
+                        SiteMapView(site: site, position: .camera(MapCamera(centerCoordinate: site.location, distance: 1000, heading: 250, pitch: 80)))
                     } label: {
                         Map(position: $position) {
                             Annotation(site.name, coordinate: site.location)
@@ -74,7 +80,7 @@ struct SiteDetail: View {
                                 .padding([.leading, .bottom], 5)
                                 .padding(.trailing, 8)
                                 .background(.regularMaterial)
-                                
+                                .clipShape(.rect(bottomTrailingRadius: 15))
                         })
                         .clipShape(.rect(cornerRadius: 15))
                         .padding(.bottom, 10)
@@ -91,9 +97,4 @@ struct SiteDetail: View {
         .ignoresSafeArea()
         .toolbarBackground(.hidden)
     }
-}
-
-#Preview {
-    SiteDetail(site: CountrySite(id: 1, name: "Country Site", image: "asd", type: .castle, latitude: 35.0394, longitude: 135.7292, openHours: CountrySite.OpenHours(start: "a", end: "b"), description: "Description"), isOpen: true, position: .camera(MapCamera(centerCoordinate: CLLocationCoordinate2D(latitude: 35.0394, longitude: 135.7292), distance: 30000)), siteImage: Image(systemName: "globe"))
-        .preferredColorScheme(.dark)
 }

@@ -9,20 +9,18 @@ import Foundation
 import SwiftUI
 import MapKit
 
-struct CountrySite: Decodable, Identifiable {
+struct SiteModel: Decodable, Identifiable {
     let id: Int
     let name: String
-    let image: String
+    let image: URL
     let type : SiteType
     let latitude: Double
     let longitude: Double
     let openHours: OpenHours
     let description: String
-    
     var location: CLLocationCoordinate2D {
         CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
     }
-    
     struct OpenHours: Decodable {
         let start: String
         let end: String
